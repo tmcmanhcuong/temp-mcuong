@@ -4,15 +4,13 @@ metadata:
   namespace: demo
   name: alice-developer
 rules:
-  # Cho phép quản lý Argo Rollouts (vì dự án đang dùng kind: Rollout thay vì Deployment)
-  - apiGroups: ["argoproj.io"]
-    resources: ["rollouts", "analysistemplates"]
-    verbs: ["*"]
-  # Cho phép quản lý Deployments tiêu chuẩn (nếu có dùng)
+
+  # - apiGroups: ["argoproj.io"]
+  #   resources: ["rollouts", "analysistemplates"]
+  #   verbs: ["*"]
   - apiGroups: ["apps"]
     resources: ["deployments"]
     verbs: ["*"]
-  # Cho phép quản lý Pods, Services, Logs và Exec terminal
-  - apiGroups: [""]
-    resources: ["pods", "pods/log", "pods/exec", "services"]
-    verbs: ["*"]
+  # - apiGroups: [""]
+  #   resources: ["pods", "pods/log", "pods/exec", "services"]
+  #   verbs: ["*"]
