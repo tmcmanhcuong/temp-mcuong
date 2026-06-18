@@ -3,12 +3,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root
+  name: root-lab10
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/Vuong-Bach/temp.git
+    repoURL: https://github.com/tmcmanhcuong/temp-mcuong.git
     path: argocd/apps
     targetRevision: main
   destination:
