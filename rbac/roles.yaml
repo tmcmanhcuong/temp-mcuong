@@ -5,12 +5,12 @@ metadata:
   name: alice-developer
 rules:
 
-  # - apiGroups: ["argoproj.io"]
-  #   resources: ["rollouts", "analysistemplates"]
-  #   verbs: ["*"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["rollouts", "analysistemplates"]
+    verbs: ["*"]
   - apiGroups: ["apps"]
     resources: ["deployments"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec", "services"]
     verbs: ["*"]
-  # - apiGroups: [""]
-  #   resources: ["pods", "pods/log", "pods/exec", "services"]
-  #   verbs: ["*"]
