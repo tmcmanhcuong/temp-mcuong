@@ -1,0 +1,37 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspnonroot
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPNonRoot
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spspnonroot
+
+        get_pod_spec(obj) = spec {
+          spec := obj.spec.template.spec
+        }
+        get_pod_spec(obj) = spec {
+          not obj.spec.template.spec
+          spec := obj.spec
+        }
+
+        # Check ở mức Container
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          container := spec.containers[_]
+          container.securityContext.runAsUser == 0
+          msg := sprintf("Container '%v' is running as root (runAsUser: 0) which is disallowed", [container.name])
+        }
+        # Check ở mức Pod
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          spec.securityContext.runAsUser == 0
+          msg := "Pod securityContext specifies runAsUser: 0 which is disallowed"
+        }

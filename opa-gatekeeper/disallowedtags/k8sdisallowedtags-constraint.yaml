@@ -1,0 +1,17 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowedTags
+metadata:
+  name: block-latest-tag
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+      - apiGroups: ["argoproj.io"]
+        kinds: ["Rollout"]
+  parameters:
+    tags: ["latest"]

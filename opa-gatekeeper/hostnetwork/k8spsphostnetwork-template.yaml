@@ -1,0 +1,29 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostnetwork
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostNetwork
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsphostnetwork
+
+        get_pod_spec(obj) = spec {
+          spec := obj.spec.template.spec
+        }
+        get_pod_spec(obj) = spec {
+          not obj.spec.template.spec
+          spec := obj.spec
+        }
+
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          spec.hostNetwork == true
+          msg := "Using hostNetwork is disallowed"
+        }

@@ -1,0 +1,51 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowedtags
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowedTags
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowedtags
+
+        # Hàm lấy pod spec cho cả Pod và các Workload (Deployment, Rollout...)
+        get_pod_spec(obj) = spec {
+          spec := obj.spec.template.spec
+        }
+        get_pod_spec(obj) = spec {
+          not obj.spec.template.spec
+          spec := obj.spec
+        }
+
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          container := spec.containers[_]
+          tag := image_tag(container.image)
+          tag == input.parameters.tags[_]
+          msg := sprintf("Image '%v' uses a disallowed tag '%v'", [container.image, tag])
+        }
+
+        image_tag(image) = tag {
+          parts := split(image, ":")
+          count(parts) > 1
+          tag := parts[count(parts) - 1]
+        }
+        # Nếu image không khai báo tag thì mặc định K8s coi là latest
+        image_tag(image) = tag {
+          not contains(image, ":")
+          tag := "latest"
+        }

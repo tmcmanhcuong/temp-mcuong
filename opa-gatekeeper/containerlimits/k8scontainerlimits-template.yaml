@@ -1,0 +1,42 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8scontainerlimits
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sContainerLimits
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8scontainerlimits
+
+        get_pod_spec(obj) = spec {
+          spec := obj.spec.template.spec
+        }
+        get_pod_spec(obj) = spec {
+          not obj.spec.template.spec
+          spec := obj.spec
+        }
+
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          container := spec.containers[_]
+          not container.resources.limits
+          msg := sprintf("Container '%v' does not have resource limits specified", [container.name])
+        }
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          container := spec.containers[_]
+          not container.resources.limits.cpu
+          msg := sprintf("Container '%v' does not have CPU limit specified", [container.name])
+        }
+        violation[{"msg": msg}] {
+          spec := get_pod_spec(input.review.object)
+          container := spec.containers[_]
+          not container.resources.limits.memory
+          msg := sprintf("Container '%v' does not have Memory limit specified", [container.name])
+        }
