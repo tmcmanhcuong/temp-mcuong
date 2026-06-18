@@ -1,0 +1,39 @@
+#alice-developer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: alice-developer-binding
+  namespace: demo
+subjects:
+- kind: User
+  name: alice
+roleRef:
+  kind: Role
+  name: alice-developer
+  apiGroup: rbac.authorization.k8s.io
+---
+#bob-sre
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bob-sre-binding
+subjects:
+- kind: User
+  name: bob
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+#carol-viewer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: carol-viewer-binding
+subjects:
+- kind: User
+  name: carol
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
