@@ -4,7 +4,7 @@ metadata:
   name: image-policy
 spec:
   images:
-    - glob: "*"
+    - glob: "**"
   authorities:
     - key:
         data: |
