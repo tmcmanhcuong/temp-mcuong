@@ -14,5 +14,13 @@ spec:
         kinds: ["Deployment"]
       - apiGroups: ["argoproj.io"]
         kinds: ["Rollout"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - argocd
+      - monitoring
+      - external-secrets
+      - ingress-nginx
+      - cosign-system
   parameters:
     labels: ["mcuong"]
